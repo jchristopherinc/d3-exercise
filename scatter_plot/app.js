@@ -10,6 +10,7 @@ var data = [
 ];
 var chart_width = 800;
 var chart_height = 400;
+var padding = 50;
 
 //create SVG element
 var svg = d3.select('#chart')
@@ -17,19 +18,44 @@ var svg = d3.select('#chart')
       .attr('height', chart_height)
       .attr('width', chart_width);
 
+//create scales
+var x_scale = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) {
+          return d[0];
+        })])
+        .range([padding, chart_width - padding * 2]);
+
+var y_scale = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) {
+          return d[1];
+        })])
+        .range([chart_height - padding * 2, padding]);
+
+var r_scale = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) {
+          return d[1];
+        })])
+        .range([5, 30]);
+
+var a_scale = d3.scaleSqrt()
+        .domain([0, d3.max(data, function(d) {
+          return d[1];
+        })])
+        .range([0, 25]);
+
 //create circles
 svg.selectAll('circle')
    .data(data)
    .enter()
    .append('circle')
    .attr('cx', function(d) {
-     return d[0];
+     return x_scale(d[0]);
    })
    .attr('cy', function(d) {
-     return d[1];
+     return y_scale(d[1]);
    })
    .attr('r', function(d) {
-     return d[1] / 10;
+     return a_scale(d[1]);
    })
    .attr('fill', '#D1AB0E');
 
@@ -42,8 +68,8 @@ svg.selectAll('text')
      return d.join(',');
    })
    .attr('x', function(d) {
-     return d[0];
+     return x_scale(d[0]);
    })
    .attr('y', function(d) {
-     return d[1];
+     return y_scale(d[1]);
    });
